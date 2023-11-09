@@ -38,8 +38,8 @@ public class AnnotationAspect {
             scope = Scope.PROTOTYPE;
         }
 
-        if (scope == Scope.SINGLETON && RouteRegister.singletonMap.containsKey(constructedClass.getName())) {
-            return RouteRegister.singletonMap.get(constructedClass.getName());
+        if (scope == Scope.SINGLETON && RouteRegister.diEngine.isSingletonCreated(constructedClass.getName())) {
+            return RouteRegister.diEngine.getSingleton(constructedClass.getName());
         }
 
         // Retrieve fields and their annotations
@@ -82,7 +82,7 @@ public class AnnotationAspect {
         }
 
         if(scope == Scope.SINGLETON) {
-            RouteRegister.singletonMap.put(constructedClass.getName(), constructedObject);
+            RouteRegister.diEngine.addSingleton(constructedClass.getName(), constructedObject);
         }
 
         return constructedObject;

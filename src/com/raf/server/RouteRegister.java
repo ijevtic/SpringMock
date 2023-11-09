@@ -21,16 +21,12 @@ import java.util.Set;
 import static org.reflections.scanners.Scanners.*;
 
 public class RouteRegister {
-    public static Map<String, Object> controllerMap;
-    public static Map<String, Object> routes;
-    public static Map<String, Object> singletonMap;
     public static DependencyContainer dependencyContainer;
+    public static DIEngine diEngine;
 
     public RouteRegister() {
-        controllerMap = new HashMap<>();
-        routes = new HashMap<>();
-        singletonMap = new HashMap<>();
         dependencyContainer = new DependencyContainer();
+        diEngine = new DIEngine();
     }
 
     public void registerRoutes() {
@@ -66,7 +62,7 @@ public class RouteRegister {
                     System.out.println(((ControllerTest2) controller).att.getClass());
                 }
 
-                controllerMap.put(aClass.getName(), controller);
+                diEngine.putController(aClass.getName(), controller);
 
                 for(Method controllerMethod: aClass.getMethods()) {
                     if(controllerMethod.isAnnotationPresent(Path.class)) {
@@ -80,7 +76,7 @@ public class RouteRegister {
                             httpMethod = HttpMethod.POST;
                         }
 
-                        routes.put(httpMethod + " " + requestMapping.value(), new Pair<Object, Object>(controller, controllerMethod));
+                        diEngine.putRoute(httpMethod + " " + requestMapping.value(), new Pair<Object, Object>(controller, controllerMethod));
                         System.out.println(httpMethod + " " + requestMapping.value());
                     }
                 }
