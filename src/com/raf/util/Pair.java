@@ -3,28 +3,28 @@ package com.raf.util;
 import java.util.Objects;
 
 public class Pair<T,V> {
-    private T key;
-    private V value;
+    private T first;
+    private V second;
 
-    public Pair(T key, V value) {
-        this.key = key;
-        this.value = value;
+    public Pair(T first, V second) {
+        this.first = first;
+        this.second = second;
     }
 
-    public T getKey() {
-        return key;
+    public T getFirst() {
+        return first;
     }
 
-    public V getValue() {
-        return value;
+    public V getSecond() {
+        return second;
     }
 
-    public void setKey(T key) {
-        this.key = key;
+    public void setFirst(T first) {
+        this.first = first;
     }
 
-    public void setValue(V value) {
-        this.value = value;
+    public void setSecond(V second) {
+        this.second = second;
     }
 
     @Override
@@ -32,11 +32,11 @@ public class Pair<T,V> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Pair<?, ?> pair = (Pair<?, ?>) o;
-        return Objects.equals(key, pair.key) && Objects.equals(value, pair.value);
+        return Objects.equals(first, pair.first) && Objects.equals(second, pair.second);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(key, value);
+        return Objects.hash(first, second);
     }
 }

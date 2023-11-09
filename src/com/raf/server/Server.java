@@ -12,13 +12,6 @@ public class Server {
         RouteRegister routeRegister = new RouteRegister();
         routeRegister.registerControllers();
 
-//        for(String key : RouteRegister.controllerMap.keySet()) {
-//            System.out.println(key);
-//            Object controller = RouteRegister.controllerMap.get(key);
-//            ControllerTest controllerTest = (ControllerTest) controller;
-//            System.out.println(controllerTest.gas);
-//        }
-
         try {
             ServerSocket serverSocket = new ServerSocket(TCP_PORT);
             System.out.println("Server is running at http://localhost:"+TCP_PORT);

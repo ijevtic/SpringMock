@@ -76,7 +76,7 @@ public class RouteRegister {
                             httpMethod = HttpMethod.POST;
                         }
 
-                        diEngine.putRoute(httpMethod + " " + requestMapping.value(), new Pair<Object, Object>(controller, controllerMethod));
+                        diEngine.putRoute(httpMethod, requestMapping.value(), new Pair<Object, Object>(controller, controllerMethod));
                         System.out.println(httpMethod + " " + requestMapping.value());
                     }
                 }

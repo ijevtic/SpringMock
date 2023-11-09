@@ -1,6 +1,7 @@
 package com.raf.server;
 
 
+import com.google.gson.Gson;
 import com.raf.framework.request.Header;
 import com.raf.framework.request.Helper;
 import com.raf.framework.request.Request;
@@ -8,8 +9,10 @@ import com.raf.framework.request.enums.Method;
 import com.raf.framework.request.exceptions.RequestNotValidException;
 import com.raf.framework.response.JsonResponse;
 import com.raf.framework.response.Response;
+import com.raf.util.Pair;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +23,7 @@ public class ServerThread implements Runnable {
     private BufferedReader in;
     private PrintWriter out;
 
-    public ServerThread(Socket socket){
+    public ServerThread(Socket socket) {
         this.socket = socket;
 
         try {
@@ -48,6 +51,26 @@ public class ServerThread implements Runnable {
                 return;
             }
 
+            Object requestData = RouteRegister.diEngine.findRoute(request.getMethod().toString(), request.getLocation());
+
+            if(requestData == null) {
+                out.println("HTTP/1.1 404 Not Found");
+                out.println("Content-Type: text/html");
+                out.println("Content-Length: 0");
+                out.println("");
+                in.close();
+                out.close();
+                socket.close();
+                return;
+            }
+
+            Pair<Object, java.lang.reflect.Method> routeData = (Pair<Object, java.lang.reflect.Method>) requestData;
+            Object controller = routeData.getFirst();
+            java.lang.reflect.Method method = routeData.getSecond();
+
+            // Invoke method
+            Object responseContent = method.invoke(controller, request.getParameters());
+
 
             // Response example
             Map<String, Object> responseMap = new HashMap<>();
@@ -56,7 +79,10 @@ public class ServerThread implements Runnable {
             responseMap.put("parameters", request.getParameters());
             Response response = new JsonResponse(responseMap);
 
-            out.println(response.render());
+            Gson gson = new Gson();
+            String json = gson.toJson(responseContent);
+
+            out.println(json);
 
             in.close();
             out.close();
@@ -64,6 +90,10 @@ public class ServerThread implements Runnable {
 
         } catch (IOException | RequestNotValidException e) {
             e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 
