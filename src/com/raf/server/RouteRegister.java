@@ -9,6 +9,7 @@ import org.reflections.Reflections;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,23 +47,23 @@ public class RouteRegister {
         for (Class<?> aClass : controllers) {
             System.out.println(aClass.getName());
             try {
-                Object controller = aClass.newInstance();
+                Object controller = aClass.getDeclaredConstructor().newInstance();
                 System.out.println(controller);
                 //check if class has annotation
                 if(aClass.isAnnotationPresent(Controller.class)) {
                     System.out.println("Class has annotationAAAAAA");
                 }
                 if(aClass.equals(ControllerTest.class)) {
-                    System.out.println("ispis gasa u mainu " + ((ControllerTest)controller).gas);
-                    System.out.println("ispis liste " + ((ControllerTest)controller).gas.lista);
-                    ((ControllerTest)controller).gas.lista.add("dodao sam");
-                    System.out.println("ispis liste " + ((ControllerTest)controller).gas.lista);
+                    System.out.println("ispis gasa u mainu " + ((ControllerTest)controller).att);
+                    System.out.println("ispis liste " + ((ControllerTest)controller).att.lista);
+                    ((ControllerTest)controller).att.lista.add("dodao sam");
+                    System.out.println("ispis liste " + ((ControllerTest)controller).att.lista);
 
                 } else {
-                    System.out.println("ispis gasa u mainu " + ((ControllerTest2)controller).gas);
-                    System.out.println("ispis liste " + ((ControllerTest2)controller).gas.lista);
-                    ((ControllerTest2)controller).gas.lista.add("dodao sam");
-                    System.out.println("ispis liste " + ((ControllerTest2)controller).gas.lista);
+                    System.out.println("ispis gasa u mainu " + ((ControllerTest2)controller).att);
+                    System.out.println("ispis liste " + ((ControllerTest2)controller).att.lista);
+                    ((ControllerTest2)controller).att.lista.add("dodao sam");
+                    System.out.println("ispis liste " + ((ControllerTest2)controller).att.lista);
 
                 }
 
@@ -81,6 +82,10 @@ public class RouteRegister {
             } catch (InstantiationException e) {
                 throw new RuntimeException(e);
             } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            } catch (NoSuchMethodException e) {
                 throw new RuntimeException(e);
             }
         }
