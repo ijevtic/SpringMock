@@ -29,10 +29,6 @@ public class AnnotationAspect {
             return constructedObject;
         }
 
-        System.out.println("Class name: " + constructedClass.getSimpleName());
-
-        System.out.println("Intercepting object creation of annotated class");
-
         Scope scope = Scope.SINGLETON;
 
         if (constructedClass.isAnnotationPresent(Bean.class)) {
@@ -49,11 +45,22 @@ public class AnnotationAspect {
         // Retrieve fields and their annotations
         Field[] fields = constructedClass.getDeclaredFields();
         for (Field field : fields) {
-            System.out.println("Field: " + field.getName());
 
             Class<?> fieldClass = field.getType();
 
             if(field.isAnnotationPresent(Autowired.class)) {
+
+                if(fieldClass.isInterface()) {
+                    Qualifier qualifierAnnotation = field.getAnnotation(Qualifier.class);
+                    System.out.println(fieldClass.getName());
+                    if(qualifierAnnotation == null) {
+                        System.out.println(constructedClass.getName() + " " + fieldClass.getName());
+                        throw new Exception("No qualifier found for interface " + fieldClass.getName());
+                    }
+                    String qualifier = qualifierAnnotation.value();
+                    fieldClass = RouteRegister.dependencyContainer.getImplementation(fieldClass, qualifier);
+                }
+
                 Autowired autowiredAnnotation = field.getAnnotation(Autowired.class);
                 if(autowiredAnnotation.verbose()) {
                     LocalDateTime now = LocalDateTime.now();

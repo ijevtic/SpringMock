@@ -2,9 +2,12 @@ package com.raf.server;
 
 
 import com.raf.annotations.Controller;
+import com.raf.annotations.GET;
+import com.raf.annotations.POST;
 import com.raf.annotations.Path;
-import com.raf.controller.ControllerTest;
-import com.raf.controller.ControllerTest2;
+import com.raf.controller.*;
+import com.raf.util.HttpMethod;
+import com.raf.util.Pair;
 import org.reflections.Reflections;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
@@ -21,11 +24,13 @@ public class RouteRegister {
     public static Map<String, Object> controllerMap;
     public static Map<String, Object> routes;
     public static Map<String, Object> singletonMap;
+    public static DependencyContainer dependencyContainer;
 
     public RouteRegister() {
         controllerMap = new HashMap<>();
         routes = new HashMap<>();
         singletonMap = new HashMap<>();
+        dependencyContainer = new DependencyContainer();
     }
 
     public void registerRoutes() {
@@ -34,6 +39,10 @@ public class RouteRegister {
 
 
     public void registerControllers() {
+
+        dependencyContainer.addNewImplementation(Interface1.class, "impl1", TestAttributeClass.class);
+        dependencyContainer.addNewImplementation(Interface1.class, "impl2", TestAttributeClass2.class);
+
         System.out.println("Registering controllers...");
 
         Reflections reflections = new Reflections(
@@ -48,35 +57,31 @@ public class RouteRegister {
             System.out.println(aClass.getName());
             try {
                 Object controller = aClass.getDeclaredConstructor().newInstance();
-                System.out.println(controller);
-                //check if class has annotation
-                if(aClass.isAnnotationPresent(Controller.class)) {
-                    System.out.println("Class has annotationAAAAAA");
-                }
-                if(aClass.equals(ControllerTest.class)) {
-                    System.out.println("ispis gasa u mainu " + ((ControllerTest)controller).att);
-                    System.out.println("ispis liste " + ((ControllerTest)controller).att.lista);
-                    ((ControllerTest)controller).att.lista.add("dodao sam");
-                    System.out.println("ispis liste " + ((ControllerTest)controller).att.lista);
-
-                } else {
-                    System.out.println("ispis gasa u mainu " + ((ControllerTest2)controller).att);
-                    System.out.println("ispis liste " + ((ControllerTest2)controller).att.lista);
-                    ((ControllerTest2)controller).att.lista.add("dodao sam");
-                    System.out.println("ispis liste " + ((ControllerTest2)controller).att.lista);
-
-                }
 
                 System.out.println("registered new instanced controller: " + controller.getClass().getName());
+                if(controller instanceof ControllerTest) {
+                    System.out.println(((ControllerTest) controller).att.getClass());
+                }
+                if(controller instanceof ControllerTest2) {
+                    System.out.println(((ControllerTest2) controller).att.getClass());
+                }
 
                 controllerMap.put(aClass.getName(), controller);
 
+                for(Method controllerMethod: aClass.getMethods()) {
+                    if(controllerMethod.isAnnotationPresent(Path.class)) {
+                        Path requestMapping = controllerMethod.getAnnotation(Path.class);
+                        HttpMethod httpMethod = HttpMethod.GET;
+                        if(!controllerMethod.isAnnotationPresent(GET.class) && !controllerMethod.isAnnotationPresent(POST.class)) {
+                            //TODO error handling
+                            throw new RuntimeException("Controller method must be annotated with either GET or POST");
+                        }
+                        if(controllerMethod.isAnnotationPresent(POST.class)) {
+                            httpMethod = HttpMethod.POST;
+                        }
 
-                for(Method method: aClass.getMethods()) {
-                    if(method.isAnnotationPresent(Path.class)) {
-                        Path requestMapping = method.getAnnotation(Path.class);
-                        routes.put(requestMapping.value(), method);
-                        System.out.println(requestMapping.value());
+                        routes.put(httpMethod + " " + requestMapping.value(), new Pair<Object, Object>(controller, controllerMethod));
+                        System.out.println(httpMethod + " " + requestMapping.value());
                     }
                 }
             } catch (InstantiationException e) {

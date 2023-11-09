@@ -1,15 +1,13 @@
 package com.raf.controller;
 
-import com.raf.annotations.Autowired;
-import com.raf.annotations.Controller;
-import com.raf.annotations.GET;
-import com.raf.annotations.Path;
+import com.raf.annotations.*;
 
 @Controller
 public class ControllerTest2 {
 
     @Autowired
-    public TestAttributeClass att;
+    @Qualifier("impl2")
+    public Interface1 att;
 
     @GET
     @Path("/users1")
