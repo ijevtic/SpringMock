@@ -1,0 +1,7 @@
+<aspectj>
+    <aspects>
+        <aspect name="com.raf.framework.AnnotationAspect" />
+    </aspects>
+	<weaver options="-verbose -showWeaveInfo -Xset:weaveJavaxPackages=true">
+    </weaver>
+</aspectj>
