@@ -50,7 +50,6 @@ public class ServerThread implements Runnable {
                 socket.close();
                 return;
             }
-
             Object requestData = RouteRegister.diEngine.findRoute(request.getMethod().toString(), request.getLocation());
 
             if(requestData == null) {
@@ -69,20 +68,22 @@ public class ServerThread implements Runnable {
             java.lang.reflect.Method method = routeData.getSecond();
 
             // Invoke method
-            Object responseContent = method.invoke(controller, request.getParameters());
+            System.out.println(method.getName());
+            Object responseContent;
+            HashMap<String, String> parameters = request.getParameters();
+            Object[] methodArguments = new Object[parameters.size()];
 
+            int index = 0;
+            for (Map.Entry<String, String> entry : parameters.entrySet()) {
+                methodArguments[index] = entry.getValue();
+                index++;
+            }
 
-            // Response example
-            Map<String, Object> responseMap = new HashMap<>();
-            responseMap.put("route_location", request.getLocation());
-            responseMap.put("route_method", request.getMethod().toString());
-            responseMap.put("parameters", request.getParameters());
-            Response response = new JsonResponse(responseMap);
+            // Invoking the method with the arguments
+            responseContent = method.invoke(controller, methodArguments);
+            Response response = (Response) responseContent;
 
-            Gson gson = new Gson();
-            String json = gson.toJson(responseContent);
-
-            out.println(json);
+            out.println(response.render());
 
             in.close();
             out.close();
@@ -102,12 +103,14 @@ public class ServerThread implements Runnable {
         if(command == null) {
             return null;
         }
-
         String[] actionRow = command.split(" ");
         Method method = Method.valueOf(actionRow[0]);
         String route = actionRow[1];
         Header header = new Header();
         HashMap<String, String> parameters = Helper.getParametersFromRoute(route);
+
+        if(route.contains("?"))
+            route = route.substring(0, route.indexOf("?"));
 
         do {
             command = in.readLine();

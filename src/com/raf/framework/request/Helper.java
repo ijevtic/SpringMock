@@ -16,6 +16,9 @@ public class Helper {
 
     public static HashMap<String, String> getParametersFromString(String parametersString) {
         HashMap<String, String> parameters = new HashMap<String, String>();
+        if(parametersString.isEmpty()) {
+            return parameters;
+        }
         String[] pairs = parametersString.split("&");
         for (String pair:pairs) {
             String[] keyPair = pair.split("=");

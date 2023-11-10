@@ -1,6 +1,8 @@
 package com.raf.controller;
 
 import com.raf.annotations.*;
+import com.raf.framework.response.JsonResponse;
+import com.raf.framework.response.Response;
 
 @Controller
 public class ControllerTest {
@@ -11,7 +13,14 @@ public class ControllerTest {
 
     @GET
     @Path("/users")
-    public void testUsers() {
+    public void testUsers(String s) {
 
+    }
+
+    @POST
+    @Path("/users")
+    public Response testUsers2() {
+        Response r = new JsonResponse("proba");
+        return r;
     }
 }

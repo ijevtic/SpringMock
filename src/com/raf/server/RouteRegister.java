@@ -55,12 +55,6 @@ public class RouteRegister {
                 Object controller = aClass.getDeclaredConstructor().newInstance();
 
                 System.out.println("registered new instanced controller: " + controller.getClass().getName());
-                if(controller instanceof ControllerTest) {
-                    System.out.println(((ControllerTest) controller).att.getClass());
-                }
-                if(controller instanceof ControllerTest2) {
-                    System.out.println(((ControllerTest2) controller).att.getClass());
-                }
 
                 diEngine.putController(aClass.getName(), controller);
 
